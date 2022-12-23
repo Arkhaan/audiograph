@@ -1,0 +1,13 @@
+.main-layout {
+    display: flex;
+    height: 100vh;
+}
+
+.side-panel {
+    border-style: solid;
+}
+
+.main-panel {
+    border-style: solid;
+    width: 100vw;
+}
