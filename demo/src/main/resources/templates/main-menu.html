@@ -47,7 +47,18 @@
             <div class="header">
                 <h1>Audiobank</h1>
             </div>
-            <p>This is my main div</p>
+            <div class="audiofile-box">
+                <div th:each="audiofile: ${audiofiles}">
+                    <div class="audiofile-container">
+                        <h2 th:text="${audiofile.title}"></h2>
+                        <p th:text="${audiofile.description}"></p>
+                        <audio controls>
+                            <source th:src="@{{path}/{file}.mp3(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio> 
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

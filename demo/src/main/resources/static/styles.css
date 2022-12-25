@@ -11,15 +11,16 @@
 .side-panel header {
   width: 100%;
   display:block;
-  /*padding: 0.75em	1em;*/
   text-align: center;
   padding-top:1em;
   padding-bottom: 1em;
 }
 
 .main-panel {
-    border-style: solid;
     width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 button {
@@ -27,27 +28,7 @@ button {
   border-bottom: 0;
   border-left: none;
   border-right: none;
-}
-
-.top-button {
-  width: 100%;
-  height: 120%;
-}
-
-.inner-ul {
-  display: none;
-  position: absolute;
-  z-index: 9999;
-  left:5em;
-  padding: 0em;
-}
-
-.top-button:hover + .inner-ul{
-  display: block;
-}
-
-.inner-ul:hover {
-  display: block;
+  transition: 0.3s;
 }
 
 .menu-list {
@@ -59,14 +40,56 @@ button {
 
 .outer-li {
   list-style: none;
-  /*border: solid;*/
   margin:0em;
   padding:0em;
   height: 100%;
+}
+
+.top-button {
+  width: 100%;
+  height: 120%;
+}
+
+.top-button:hover + .inner-ul{
+  display: block;
+}
+
+.inner-ul {
+  display: none;
+  position: relative;
+  top:-1em;
+  z-index: 9999;
+  left:5em;
+  padding: 0em;
+  transition: 1.5s;
+  /*border-style: solid;*/
+}
+
+.inner-ul:hover {
+  display: block;
 }
 
 .inner-li {
   list-style: none;
   margin:0em;
   padding:0em;
+}
+
+.audiofile-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  /*border-style: solid;*/
+}
+
+.audiofile-container {
+  padding-left: 1em;
+  padding-right: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
 }
