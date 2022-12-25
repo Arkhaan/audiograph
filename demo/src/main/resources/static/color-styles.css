@@ -1,3 +1,14 @@
 body {
     background-color: rgb(231, 228, 212);
 }
+
+button {
+  color: white;
+  background-color: #008cba;
+  border-top-color: #08556e;
+}
+
+.side-panel header {
+    background-color: #09f;
+    color: white;
+}
