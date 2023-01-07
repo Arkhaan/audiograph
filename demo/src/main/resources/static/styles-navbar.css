@@ -1,0 +1,28 @@
+#title {
+    margin: auto;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3em;
+    font-weight: bold;
+    margin: auto;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+nav a img {
+    height: 50px;
+    width: 50px;
+}

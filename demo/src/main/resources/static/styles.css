@@ -6,6 +6,7 @@
 .side-panel {
     /*border-style: solid;*/
     margin: 0;
+    width: 15%;
 }
 
 .side-panel header {
@@ -14,6 +15,7 @@
   text-align: center;
   padding-top:1em;
   padding-bottom: 1em;
+  font-size: large;
 }
 
 .main-panel {
@@ -29,6 +31,16 @@ button {
   border-left: none;
   border-right: none;
   transition: 0.3s;
+  width: 100%;
+}
+
+a {
+  font-size: medium;
+}
+
+.query-param {
+  text-decoration: none;
+  color: white;
 }
 
 .menu-list {
@@ -85,11 +97,35 @@ button {
 }
 
 .audiofile-container {
-  padding-left: 1em;
-  padding-right: 1em;
+  /*padding-left: 1em;
+  padding-right: 1em;*/
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content:center;
   align-items: center;
   height: 100%;
+  border-style: solid;
+  border-radius: 3%;
+  border-color: blueviolet;
+  margin: 10px;
+  height: 15em;
+  width: 20em;
+}
+
+.audiofile-container p {
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.logout {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  height: 50px;
+  width: 50px;
+}
+
+.logout img {
+  height: 50px;
+  width: 50px;
 }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles-login.css" />
+    <link rel="stylesheet" href="/styles-navbar.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="sign-up-window">
+    <div id="sign-up-form">
+        <form action='/login' method="post">
+
+            <p id="form-title">Log in</p>
+
+            <input type="text" id="name" name="login" placeholder="Login" required>
+            <input type="password" id="password" name="password" placeholder="Password">
+
+            <button id="form-button">GO!</button>
+
+        </form>
+        <p th:if="${loginFailed}">Nom d'utilisateur ou mot de passe incorrect</p>
+        <p th:unless="${registrationSuccess}">Pas encore membre? <a href="/create-account">Clicquez ici pour créer un compte</a></p>
+        <p th:if="${registrationSuccess}">Enregistrement réussi, bienvenu!</a></p>
+        <p th:if="${logoutSuccess}">Déconnexion réussie!</a></p>
+    </div>
+</div>
+
+
+
+</body>
+</html>

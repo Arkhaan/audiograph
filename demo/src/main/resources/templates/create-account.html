@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create new account</title>
+    <link rel="stylesheet" href="/styles-login.css" />
+    <link rel="stylesheet" href="/styles-navbar.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="sign-up-window">
+    <div id="sign-up-form">
+        <form action="/create-account" method="post">
+
+            <p id="form-title">Create new account</p>
+
+            <input type="text" id="name" name="login" placeholder="Username" maxlength="45" required>
+            <select name="fullname" id="fullname" onchange="fullnameChange(this.value);">
+                <option>Choisissez une option...</option>
+                <option th:each="fullname : ${fullnames}"
+                        th:value="${fullname}" th:text="${fullname}"></option>
+                <option value="new">Nouveau Membre</option>
+            </select>
+            <input type="text" id="firstName" name="firstName" placeholder="Jean" maxlength="45" required hidden>
+            <input type="text" id="lastName" name="lastName" placeholder="Dupont" maxlength="45" required hidden>
+
+            <button type="submit" id="form-button">SIGN ME UP</button>
+
+        </form>
+        <p th:if="${registrationFail}">Erreur lors de la création du compte:\nL'email est déjà utilisé ou le compte a déjà été enregistré!</p>
+    </div>
+    <a class="back-button" href="/login">Back</a>
+
+
+
+</div>
+
+
+
+
+<script>
+
+    function fullnameChange(value) {
+        if (value == "new") {
+            document.getElementById("firstName").hidden = false;
+            document.getElementById("lastName").hidden = false;
+            document.getElementById("firstName").value = "";
+            document.getElementById("lastName").value = "";
+        }
+        else {
+            document.getElementById("firstName").hidden = true;
+            document.getElementById("lastName").hidden = true;
+            document.getElementById("firstName").value = value.split(" ")[0];
+            document.getElementById("lastName").value = value.split(" ")[1];
+        }
+    }
+
+</script>
+
+
+
+
+
+</body>
+</html>

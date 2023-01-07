@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="/color-styles.css" />
 </head>
 <body>
+    <a class="logout" href="/logout">
+        <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-10-1/1024/logout10-512.png" alt="logout" title="logout">
+    </a>
     <div class="main-layout">
         <section class="side-panel">
             <header>
@@ -18,27 +21,30 @@
                     <li class="outer-li">
                         <button type="button" class="top-button"> Catégories </button>
                         <ul class="inner-ul">
-                            <li class="inner-li">
-                                <button type="button"> Catégorie 1 </button>
-                            </li>
-                            <li class="inner-li">
-                                <button type="button"> Catégorie 2 </button>
+                            <li th:each="tag: ${tags}" class="inner-li">
+                                <button type="button">
+                                    <a class="query-param" th:text="${tag.value}" th:href="@{/(tagid = ${tag.id})}"></a>
+                                </button>
                             </li>
                         </ul>
                     </li>
                     <li class="outer-li">
                         <button type="button" class="top-button">Membres</button>
                         <ul class="inner-ul">
-                            <li class="inner-li">
-                                <button type="button"> Membre 1 </button>
-                            </li>
-                            <li class="inner-li">
-                                <button type="button"> Membre 2 </button>
+                            <li th:each="user: ${users}" class="inner-li">
+                                <button type="button">
+                                    <a class="query-param" th:text="${user.first_name + ' ' + user.last_name}" th:href="@{/(userid = ${user.id})}"></a>
+                                </button>
                             </li>
                         </ul>
                     </li>
                     <li class="outer-li">
                         <button type="button" class="top-button">Gérer mes fichiers</button>
+                    </li>
+                    <li class="outer-li">
+                        <button type="button" class="top-button">
+                            <a class="query-param" href="/upload-file">Télécharger un fichier</a>
+                        </button>
                     </li>
                 </ul>
             </nav>
@@ -55,7 +61,9 @@
                         <audio controls>
                             <source th:src="@{{path}/{file}.mp3(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
                             Your browser does not support the audio element.
-                        </audio> 
+                        </audio>
+                        <p th:text="${audiofile.full_names}"></p>
+                        <i><p th:text="${audiofile.tags}"></p></i>
                     </div>
                 </div>
             </div>
