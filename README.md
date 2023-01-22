@@ -1,4 +1,4 @@
-You need to create application.properties in ressources with the following properties:
+You need to create application.properties in resources with the following properties:
 
 spring.datasource.url=<database URL>
 spring.datasource.username=<database login>
