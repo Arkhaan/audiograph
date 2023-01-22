@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +26,7 @@ import com.audiobank.demo.services.UserService;
 import com.audiobank.demo.models.Audiofile;
 import com.audiobank.demo.models.Tag;
 import com.audiobank.demo.models.User;
+import com.audiobank.demo.models.DTOs.AudiofileDTO;
 
 @Controller
 @SessionAttributes("apikey")
@@ -73,9 +75,6 @@ public class AudiobankController {
         else {
             audiofiles = audiofileRepo.findAll();
         }
-        for ( Audiofile audiofile : audiofiles ) {
-            System.out.println(audiofile.getTitle());
-        }
         model.addAttribute("audiofiles", audiofiles);
         //System.out.println(audiofiles.get(0).getFull_names());
         //System.out.println(audiofiles.get(0).getTags());
@@ -109,7 +108,12 @@ public class AudiobankController {
     @PostMapping("/create-account")
     public String createAccount(Model model, @RequestParam String email,
                                 @RequestParam String firstName,
-                                @RequestParam String lastName) {
+                                @RequestParam String lastName,
+                                @RequestParam String inviteCode) {
+        if (!inviteCode.equals("eFydxBaZT4RwMR")) {
+            model.addAttribute("wrongCode", true);
+            return "create-account";
+        }
         if( userService.createAccount(email, firstName, lastName) ) {
             model.addAttribute("registrationSuccess", true);
             return "login";
@@ -128,25 +132,33 @@ public class AudiobankController {
 
     @RequestMapping("/upload-file")
     public String getUploadFile(Model model) {
+        if (model.getAttribute("apikey") == null) {
+            return "redirect:/login";
+        }
         List<String> names = userService.getAllFullName();
         model.addAttribute("fullnames", names);
         List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
                                     .collect(Collectors.toList());
         model.addAttribute("categories", categories);
+        model.addAttribute("audiofile", new AudiofileDTO());
         return "upload-file";
     }
 
     @RequestMapping(value = "/upload-file", method = RequestMethod.POST)
-    public String uploadFile(Model model, @RequestParam("file") MultipartFile multipartFile,
-                                @RequestParam("title") String title,
-                                @RequestParam("fullname") String fullname,
-                                @RequestParam("category") String category) throws IOException {
-        if ( fileService.saveFile(multipartFile, title, fullname, category) ) {
+    public String uploadFile(Model model, @ModelAttribute("audiofile") AudiofileDTO audiofile) throws IOException {
+        String apiKey = model.getAttribute("apikey").toString();
+        if ( fileService.saveFile(audiofile, apiKey) ) {
             model.addAttribute("uploadSuccess", true);
         }
         else {
             model.addAttribute("uploadFailed", true);
         }
+        List<String> names = userService.getAllFullName();
+        model.addAttribute("fullnames", names);
+        List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
+                                    .collect(Collectors.toList());
+        model.addAttribute("categories", categories);
+        model.addAttribute("audiofile", new AudiofileDTO());
         return "upload-file";
     }
     

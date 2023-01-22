@@ -11,8 +11,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("select u from User u where u.email=:email and u.password=:password")
-    Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
+    @Query("select u from User u where u.email=:email")
+    Optional<User> findByEmail(@Param("email") String email);
+
+    @Query("select u from User u where u.first_name=:firstName and u.last_name=:lastName")
+    Optional<User> findByFullName(@Param("firstName") String firstName, @Param("lastName") String lastName);
 
     @Query("select u from User u where u.apikey=:apikey")
     Optional<User> findByApiKey(@Param("apikey") String apikey);

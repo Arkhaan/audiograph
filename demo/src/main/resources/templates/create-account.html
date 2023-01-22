@@ -5,21 +5,23 @@
     <meta charset="UTF-8">
     <title>Create new account</title>
     <link rel="stylesheet" href="/styles-login.css" />
-    <link rel="stylesheet" href="/styles-navbar.css" />
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<div th:replace="~{fragments/site-header}">
+</div>
+
 <div id="sign-up-window">
     <div id="sign-up-form">
         <form action="/create-account" method="post">
 
-            <p id="form-title">Create new account</p>
+            <p id="form-title">Créer un nouveau compte</p>
 
-            <input type="text" id="name" name="login" placeholder="Username" maxlength="45" required>
+            <input type="email" id="email" name="email" placeholder="Email" maxlength="45" required>
             <select name="fullname" id="fullname" onchange="fullnameChange(this.value);">
-                <option>Choisissez une option...</option>
+                <option>Quel est votre nom ?</option>
                 <option th:each="fullname : ${fullnames}"
                         th:value="${fullname}" th:text="${fullname}"></option>
                 <option value="new">Nouveau Membre</option>
@@ -27,12 +29,15 @@
             <input type="text" id="firstName" name="firstName" placeholder="Jean" maxlength="45" required hidden>
             <input type="text" id="lastName" name="lastName" placeholder="Dupont" maxlength="45" required hidden>
 
-            <button type="submit" id="form-button">SIGN ME UP</button>
+            <input type="text" id="inviteCode" name="inviteCode" placeholder="Code d'invitation" maxlength="45" required>
+
+            <button type="submit" id="form-button">Créer le compte</button>
 
         </form>
-        <p th:if="${registrationFail}">Erreur lors de la création du compte:\nL'email est déjà utilisé ou le compte a déjà été enregistré!</p>
+        <p th:if="${wrongCode}">Erreur lors de la création du compte:<br>Ce code d'invitation n'existe pas!</p>
+        <p th:if="${registrationFail}">Erreur lors de la création du compte:<br>L'email est déjà utilisé ou le compte a déjà été enregistré!</p>
     </div>
-    <a class="back-button" href="/login">Back</a>
+    <a class="back-button" href="/login">Retour</a>
 
 
 

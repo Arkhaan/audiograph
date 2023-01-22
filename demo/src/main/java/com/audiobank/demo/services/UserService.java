@@ -21,4 +21,7 @@ public interface UserService {
     List<String> getAllFullName();
 
     List<String> getUnclaimedUsers();
+
+    String hashPassword(String plainTextPassword);
+    boolean checkPass(String plainPassword, String hashedPassword);
 }

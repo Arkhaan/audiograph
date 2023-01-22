@@ -20,4 +20,8 @@ public class Tag {
 
     public Tag() {
     }
+
+    public Tag(String value) {
+        this.value = value;
+    }
 }

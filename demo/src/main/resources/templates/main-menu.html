@@ -6,52 +6,18 @@
     <title>Title</title>
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/color-styles.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
 </head>
 <body>
     <a class="logout" href="/logout">
         <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-10-1/1024/logout10-512.png" alt="logout" title="logout">
     </a>
     <div class="main-layout">
-        <section class="side-panel">
-            <header>
-                Menu
-            </header>
-            <nav class="sidebar-nav">
-                <ul class="menu-list">
-                    <li class="outer-li">
-                        <button type="button" class="top-button"> Catégories </button>
-                        <ul class="inner-ul">
-                            <li th:each="tag: ${tags}" class="inner-li">
-                                <button type="button">
-                                    <a class="query-param" th:text="${tag.value}" th:href="@{/(tagid = ${tag.id})}"></a>
-                                </button>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="outer-li">
-                        <button type="button" class="top-button">Membres</button>
-                        <ul class="inner-ul">
-                            <li th:each="user: ${users}" class="inner-li">
-                                <button type="button">
-                                    <a class="query-param" th:text="${user.first_name + ' ' + user.last_name}" th:href="@{/(userid = ${user.id})}"></a>
-                                </button>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="outer-li">
-                        <button type="button" class="top-button">Gérer mes fichiers</button>
-                    </li>
-                    <li class="outer-li">
-                        <button type="button" class="top-button">
-                            <a class="query-param" href="/upload-file">Télécharger un fichier</a>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </section>
+        <div th:replace="~{fragments/sidebar}">
+        </div>
         <div class="main-panel">
-            <div class="header">
-                <h1>Audiobank</h1>
+            <div th:replace="~{fragments/site-header}">
             </div>
             <div class="audiofile-box">
                 <div th:each="audiofile: ${audiofiles}">

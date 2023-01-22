@@ -3,6 +3,7 @@ package com.audiobank.demo.services;
 import com.audiobank.demo.models.User;
 import com.audiobank.demo.repositories.UserRepository;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -29,8 +30,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public String login(String email, String password) {
         // 1 - check if user in database
-        Optional<User> optionalUser = userRepository.findByEmailAndPassword(email, password);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
+            if (!checkPass(password, optionalUser.get().getPassword())) {
+                return null;
+            }
             // 2 - Create generate and save api key
             String apiKey = generateApiKey();
             User user = optionalUser.get();
@@ -49,14 +53,15 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         // 2 - Create new user
-        String password = java.util.UUID.randomUUID().toString();
-        userRepository.save(new User(email, password, firstName, lastName));
+        String plainPassword = java.util.UUID.randomUUID().toString().split("-")[0];
+        String hashedPassword = hashPassword(plainPassword);
+        userRepository.save(new User(email, hashedPassword, firstName, lastName));
         // 3 - Send email to reset password
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
             helper.setTo(email);
             helper.setSubject("Bienvenue chez Audiograph!");
-            helper.setText("Voici votre mot de passe : " + password + "\nNous vous recommendez de le changer dès que possible.");
+            helper.setText("Voici votre mot de passe : " + plainPassword + "\nNous vous recommendez de le changer dès que possible.");
         };
         javaMailSender.send(messagePreparator);
         return true;
@@ -110,4 +115,12 @@ public class UserServiceImpl implements UserService {
         secureRandom.nextBytes(values);
         return values.toString();
     }
+
+    public String hashPassword(String plainTextPassword){
+		return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+	}
+
+    public boolean checkPass(String plainPassword, String hashedPassword) {
+		return BCrypt.checkpw(plainPassword, hashedPassword);
+	}
 }

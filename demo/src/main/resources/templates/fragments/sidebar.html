@@ -1,0 +1,37 @@
+<div th:fragment="sidebar" class="side-panel">
+    <header>
+        Menu
+    </header>
+    <nav class="sidebar-nav">
+        <ul class="menu-list">
+            <li class="outer-li">
+                <button type="button" class="top-button">Trier par Catégories</button>
+                <ul class="inner-ul">
+                    <li th:each="tag: ${tags}" class="inner-li">
+                        <button type="button">
+                            <a class="query-param" th:text="${tag.value}" th:href="@{/(tagid = ${tag.id})}"></a>
+                        </button>
+                    </li>
+                </ul>
+            </li>
+            <li class="outer-li">
+                <button type="button" class="top-button">Trier par Locuteurs</button>
+                <ul class="inner-ul">
+                    <li th:each="user: ${users}" class="inner-li">
+                        <button type="button">
+                            <a class="query-param" th:text="${user.first_name + ' ' + user.last_name}" th:href="@{/(userid = ${user.id})}"></a>
+                        </button>
+                    </li>
+                </ul>
+            </li>
+            <li class="outer-li">
+                <button type="button" class="top-button">Gérer mes fichiers</button>
+            </li>
+            <li class="outer-li">
+                <button type="button" class="top-button">
+                    <a class="query-param" href="/upload-file">Télécharger un fichier</a>
+                </button>
+            </li>
+        </ul>
+    </nav>
+</div>

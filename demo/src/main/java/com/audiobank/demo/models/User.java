@@ -34,6 +34,11 @@ public class User {
         this.join_date = java.time.LocalDate.now();
     }
 
+    public User(String firstName, String lastName) {
+        this.first_name = firstName;
+        this.last_name = lastName;
+    }
+
     public void setApiKey(String apiKey) {
         this.apikey = apiKey;
     }
