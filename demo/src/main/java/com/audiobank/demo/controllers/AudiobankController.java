@@ -40,6 +40,9 @@ public class AudiobankController {
     @Value("${files.path}")
     private String filesPath;
 
+    @Value("${invitation.code}")
+    private String invitationCode;
+
     public AudiobankController(AudiofileRepository audiofileRepo,
                                 TagRepository tagRepo,
                                 UserService userService,
@@ -110,7 +113,7 @@ public class AudiobankController {
                                 @RequestParam String firstName,
                                 @RequestParam String lastName,
                                 @RequestParam String inviteCode) {
-        if (!inviteCode.equals("eFydxBaZT4RwMR")) {
+        if (!inviteCode.equals(invitationCode)) {
             model.addAttribute("wrongCode", true);
             return "create-account";
         }

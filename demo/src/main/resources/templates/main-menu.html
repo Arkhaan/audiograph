@@ -25,7 +25,7 @@
                         <h2 th:text="${audiofile.title}"></h2>
                         <p th:text="${audiofile.description}"></p>
                         <audio controls>
-                            <source th:src="@{{path}/{file}.mp3(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
+                            <source th:src="@{{path}/{file}(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
                             Your browser does not support the audio element.
                         </audio>
                         <p th:text="${audiofile.full_names}"></p>
