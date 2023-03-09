@@ -66,3 +66,8 @@ spring.mail.properties.mail.smtp.socketFactory.fallback=false
         id_user int,
         primary key(id_file, id_user)
     );
+
+**Notes**
+
+    mvn clean package spring-boot:repackage
+    java -jar target/spring-boot-ops.war

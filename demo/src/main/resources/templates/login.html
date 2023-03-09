@@ -26,7 +26,7 @@
 
         </form>
         <p th:if="${loginFailed}">Nom d'utilisateur ou mot de passe incorrect</p>
-        <p th:unless="${registrationSuccess}">Pas encore membre? <a href="/create-account">Clicquez ici pour créer un compte</a></p>
+        <p th:unless="${registrationSuccess}">Pas encore membre? <a href="/create-account">Cliquez ici pour créer un compte</a></p>
         <p th:if="${registrationSuccess}">Enregistrement réussi! Vous avez reçu votre mot de passe par email.</a></p>
         <p th:if="${logoutSuccess}">Déconnexion réussie!</a></p>
     </div>
