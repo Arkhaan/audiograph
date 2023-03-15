@@ -162,6 +162,12 @@ public class AudiobankController {
         else {
             model.addAttribute("uploadFailed", true);
         }
+
+        List<Tag> tags = tagRepo.findAll();
+        model.addAttribute("tags", tags);
+        List<User> users = userService.getAll();
+        model.addAttribute("users", users);
+
         List<String> names = userService.getAllFullName();
         model.addAttribute("fullnames", names);
         List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
