@@ -2,6 +2,9 @@ package com.audiobank.demo.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,6 +108,12 @@ public class FileServiceImpl implements FileService {
             FileUser ft = new FileUser(audiofileID, user.get().getId());
             fileUserRepo.save(ft);
         }
+    }
+
+    public void deleteFile(Long fileID, String apiKey) throws IOException {
+        Path fileToDeletePath = Paths.get(filesFullpath + audiofileRepo.getFileName(fileID));
+        audiofileRepo.deleteFile(fileID, userRepo.findByApiKey(apiKey).get().getId());
+        Files.delete(fileToDeletePath);
     }
 
 }

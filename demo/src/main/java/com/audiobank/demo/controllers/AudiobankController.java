@@ -3,6 +3,7 @@ package com.audiobank.demo.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +139,11 @@ public class AudiobankController {
         if (model.getAttribute("apikey") == null) {
             return "redirect:/login";
         }
+        List<Tag> tags = tagRepo.findAll();
+        model.addAttribute("tags", tags);
+        List<User> users = userService.getAll();
+        model.addAttribute("users", users);
+
         List<String> names = userService.getAllFullName();
         model.addAttribute("fullnames", names);
         List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
@@ -163,6 +169,31 @@ public class AudiobankController {
         model.addAttribute("categories", categories);
         model.addAttribute("audiofile", new AudiofileDTO());
         return "upload-file";
+    }
+
+    @RequestMapping(value = "/my-files")
+    public String getMyFiles(Model model) {
+        if ( model.getAttribute("apikey") == null) {
+            return "redirect:/login";
+        }
+        List<Tag> tags = tagRepo.findAll();
+        model.addAttribute("tags", tags);
+        List<User> users = userService.getAll();
+        model.addAttribute("users", users);
+        model.addAttribute("filesPath", filesPath);
+        List<Audiofile> audiofiles;
+        audiofiles = audiofileRepo.findAllByUploaderID(userService.getUserId(model.getAttribute("apikey").toString()));
+        model.addAttribute("audiofiles", audiofiles);
+        return "my-files";
+    }
+
+    @RequestMapping(value = "/delete-file")
+    public String deleteFile(Model model, @RequestParam(name = "fileid") Long fileID) throws IOException {
+        if ( model.getAttribute("apikey") == null) {
+            return "redirect:/login";
+        }
+        fileService.deleteFile(fileID, model.getAttribute("apikey").toString());
+        return "redirect:/my-files";
     }
     
 }

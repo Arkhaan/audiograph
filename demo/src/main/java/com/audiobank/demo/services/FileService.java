@@ -16,4 +16,6 @@ public interface FileService {
     void addTags(List<String> tags, Long audiofileID);
     void addNames(List<String> names, Long audiofileID);
 
+    void deleteFile(Long fileID, String apiKey) throws IOException;
+
 }
