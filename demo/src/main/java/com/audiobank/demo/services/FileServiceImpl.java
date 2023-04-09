@@ -52,7 +52,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public Boolean saveFile(AudiofileDTO audiofileDTO, String apiKey) throws IOException {
         Optional<String> extension = getFileExtension(audiofileDTO.getMultipartFile().getOriginalFilename());
-        if ( extension.isPresent() && ( extension.get().equals("mp3") || extension.get().equals("wav") ) ) {
+        if ( extension.isPresent() && ( extension.get().equals("mp3") || extension.get().equals("wav") || extension.get().equals("m4a") ) ) {
             Audiofile audiofile = new Audiofile(audiofileDTO.getTitle());
             audiofile.setDescription(audiofileDTO.getDescription());
             Long uploader = userRepo.findByApiKey(apiKey).get().getId();
