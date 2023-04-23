@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,8 @@ public class FileServiceImpl implements FileService {
     FileUserRepository fileUserRepo;
     UserRepository userRepo;
 
+    List<String> supportedFormats;
+
     public FileServiceImpl(AudiofileRepository audiofileRepo,
                             TagRepository tagRepo,
                             FileTagRepository fileTagRepo,
@@ -47,16 +50,18 @@ public class FileServiceImpl implements FileService {
         this.fileTagRepo = fileTagRepo;
         this.userRepo = userRepo;
         this.fileUserRepo = fileUserRepo;
+        this.supportedFormats = Arrays.asList("mp3", "wav", "m4a");
     }
     
     @Override
     public Boolean saveFile(AudiofileDTO audiofileDTO, String apiKey) throws IOException {
         Optional<String> extension = getFileExtension(audiofileDTO.getMultipartFile().getOriginalFilename());
-        if ( extension.isPresent() && ( extension.get().equals("mp3") || extension.get().equals("wav") || extension.get().equals("m4a") ) ) {
+        if ( extension.isPresent() && supportedFormats.contains(extension.get()) ) {
             Audiofile audiofile = new Audiofile(audiofileDTO.getTitle());
             audiofile.setDescription(audiofileDTO.getDescription());
             Long uploader = userRepo.findByApiKey(apiKey).get().getId();
             audiofile.setUploader(uploader);
+            audiofile.setFileFormat(extension.get());
             audiofileRepo.save(audiofile);
             String filename = audiofile.getFile_id() + java.util.UUID.randomUUID().toString() + "." + extension.get();
             audiofileDTO.getMultipartFile().transferTo(new File(filesFullpath + filename));

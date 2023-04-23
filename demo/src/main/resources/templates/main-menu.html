@@ -29,10 +29,10 @@
                     <div class="audiofile-container">
                         <h2 th:text="${audiofile.title}"></h2>
                         <p th:text="${audiofile.description}"></p>
-                        <audio controls>
-                            <source th:src="@{{path}/{file}(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
+                        <audio controls th:switch="${audiofile.file_format}">
+                            <source th:case="'m4a'" th:src="@{{path}/{file}(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/x-m4a">
+                            <source th:case="*" th:src="@{{path}/{file}(path = ${filesPath}, file = ${audiofile.file_name})}" type="audio/mpeg">
+                            Your browser does not support the audio element.                        </audio>
                         <p th:text="${audiofile.full_names}"></p>
                         <i><p th:text="${audiofile.tags}"></p></i>
                     </div>

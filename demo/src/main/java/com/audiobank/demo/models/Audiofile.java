@@ -24,6 +24,7 @@ public class Audiofile {
     private Long uploader;
     private String title;
     private String description;
+    private String file_format;
     @Column(insertable = false, updatable = false)
     private String full_names;
     @Column(insertable = false, updatable = false)
@@ -47,5 +48,9 @@ public class Audiofile {
 
     public void setUploader(Long uploader) {
         this.uploader = uploader;
+    }
+
+    public void setFileFormat(String format) {
+        this.file_format = format;
     }
 }
