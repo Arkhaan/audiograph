@@ -61,4 +61,7 @@ public interface AudiofileRepository extends JpaRepository<Audiofile, Long> {
     @Query(value="select file_name from audiograph.audiofiles where audiofiles.file_id=:file_id", nativeQuery = true)
     String getFileName(@Param("file_id") Long fileID);
 
+    @Query(value="select file_format from audiograph.audiofiles where audiofiles.file_id=:file_id", nativeQuery = true)
+    String getExtension(@Param("file_id") Long fileID);
+
 }

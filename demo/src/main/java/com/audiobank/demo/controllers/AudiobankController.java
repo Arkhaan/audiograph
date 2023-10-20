@@ -38,7 +38,7 @@ public class AudiobankController {
     UserService userService;
     FileService fileService;
 
-    @Value("${files.path}")
+    @Value("${files.path}${files.converted}")
     private String filesPath;
 
     @Value("${invitation.code}")

@@ -9,6 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,13 +29,16 @@ import com.audiobank.demo.repositories.FileTagRepository;
 import com.audiobank.demo.repositories.FileUserRepository;
 import com.audiobank.demo.repositories.TagRepository;
 import com.audiobank.demo.repositories.UserRepository;
-import com.jayway.jsonpath.Option;
 
 @Service
 public class FileServiceImpl implements FileService {
 
     @Value("${files.fullpath}")
     private String filesFullpath;
+    @Value("${files.original}")
+    private String originalPath;
+    @Value("${files.converted}")
+    private String convertedPath;
 
     AudiofileRepository audiofileRepo;
     TagRepository tagRepo;
@@ -50,22 +58,29 @@ public class FileServiceImpl implements FileService {
         this.fileTagRepo = fileTagRepo;
         this.userRepo = userRepo;
         this.fileUserRepo = fileUserRepo;
-        this.supportedFormats = Arrays.asList("mp3", "wav", "m4a");
+        this.supportedFormats = Arrays.asList("mp3", "wav", "m4a", "adts");
     }
     
     @Override
     public Boolean saveFile(AudiofileDTO audiofileDTO, String apiKey) throws IOException {
         Optional<String> extension = getFileExtension(audiofileDTO.getMultipartFile().getOriginalFilename());
         if ( extension.isPresent() && supportedFormats.contains(extension.get()) ) {
+            // Create audiofile
             Audiofile audiofile = new Audiofile(audiofileDTO.getTitle());
             audiofile.setDescription(audiofileDTO.getDescription());
             Long uploader = userRepo.findByApiKey(apiKey).get().getId();
             audiofile.setUploader(uploader);
             audiofile.setFileFormat(extension.get());
             audiofileRepo.save(audiofile);
-            String filename = audiofile.getFile_id() + java.util.UUID.randomUUID().toString() + "." + extension.get();
-            audiofileDTO.getMultipartFile().transferTo(new File(filesFullpath + filename));
-            audiofile.setFileName(filename);
+            // Save and convert file
+            String originalFilename = audiofile.getFile_id() + java.util.UUID.randomUUID().toString() + "." + extension.get();
+            String convertedFilename = getFileNameWithoutExtension(originalFilename).get() + ".wav";
+            String originalFilePath = filesFullpath + originalPath + originalFilename;
+            String convertedFilePath = filesFullpath + convertedPath + convertedFilename;
+            audiofileDTO.getMultipartFile().transferTo(new File(originalFilePath));
+            Runtime.getRuntime().exec("ffmpeg -i " + originalFilePath + " " + convertedFilePath);
+            //Finalize audiofile
+            audiofile.setFileName(originalFilename);
             audiofileRepo.save(audiofile);
             audiofileDTO.convertNewNames();
             audiofileDTO.convertNewTags();
@@ -74,6 +89,13 @@ public class FileServiceImpl implements FileService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Optional<String> getFileNameWithoutExtension(String fileName) {
+        return Optional.ofNullable(fileName)
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(0, fileName.lastIndexOf(".")));
     }
 
     @Override
@@ -116,9 +138,14 @@ public class FileServiceImpl implements FileService {
     }
 
     public void deleteFile(Long fileID, String apiKey) throws IOException {
-        Path fileToDeletePath = Paths.get(filesFullpath + audiofileRepo.getFileName(fileID));
+        String filename = audiofileRepo.getFileName(fileID);
         audiofileRepo.deleteFile(fileID, userRepo.findByApiKey(apiKey).get().getId());
+        Path fileToDeletePath = Paths.get(filesFullpath + convertedPath + getFileNameWithoutExtension(filename).get() + ".wav");
+        Files.delete(fileToDeletePath);
+        fileToDeletePath = Paths.get(filesFullpath + originalPath + filename);
         Files.delete(fileToDeletePath);
     }
+
+
 
 }
