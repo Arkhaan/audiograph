@@ -28,7 +28,7 @@
                     <form action="/upload-file" method="post" enctype="multipart/form-data" th:object="${audiofile}">
             
                         <p id="form-title">Télécharge un nouveau fichier audio</p>
-                        <p th:if="${uploadFailed}">Erreur lors du téléchargement du ficher!<br />Nous vous conseillons d'utiliser le format mp3 pour éviter des problèmes de compatibilité.</p>
+                        <p th:if="${uploadFailed}">Erreur lors du téléchargement du ficher!<br />Il est possible qu'il n'y ait plus de place sur le serveur ou que la conversion du fichier n'ait pas fonctionné, contactez l'administrateur.</p>
                         <p th:if="${uploadSuccess}">Téléchargement réussi!</p>
             
                         <input type="text" id="title" name="title" th:field="*{title}" placeholder="Titre" maxlength="45" required>

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.FileStore;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class FileServiceImpl implements FileService {
     FileUserRepository fileUserRepo;
     UserRepository userRepo;
 
-    List<String> supportedFormats;
+    //List<String> supportedFormats;
 
     public FileServiceImpl(AudiofileRepository audiofileRepo,
                             TagRepository tagRepo,
@@ -58,13 +59,22 @@ public class FileServiceImpl implements FileService {
         this.fileTagRepo = fileTagRepo;
         this.userRepo = userRepo;
         this.fileUserRepo = fileUserRepo;
-        this.supportedFormats = Arrays.asList("mp3", "wav", "m4a", "adts");
+        //this.supportedFormats = Arrays.asList("mp3", "wav", "m4a", "adts");
     }
     
     @Override
     public Boolean saveFile(AudiofileDTO audiofileDTO, String apiKey) throws IOException {
         Optional<String> extension = getFileExtension(audiofileDTO.getMultipartFile().getOriginalFilename());
-        if ( extension.isPresent() && supportedFormats.contains(extension.get()) ) {
+        // First check if there is enough space on the disk for the file + conversion:
+        File root = new File("/");
+        long usableSpace = root.getUsableSpace();
+        long fileSize = audiofileDTO.getMultipartFile().getSize();
+        System.out.println("Usable space: " + usableSpace);
+        System.out.println("File size: " + fileSize);
+        if (usableSpace < (fileSize * 12)) {
+            return false;
+        }
+        if ( extension.isPresent() ) { //&& supportedFormats.contains(extension.get()) ) {
             // Create audiofile
             Audiofile audiofile = new Audiofile(audiofileDTO.getTitle());
             audiofile.setDescription(audiofileDTO.getDescription());
@@ -78,7 +88,17 @@ public class FileServiceImpl implements FileService {
             String originalFilePath = filesFullpath + originalPath + originalFilename;
             String convertedFilePath = filesFullpath + convertedPath + convertedFilename;
             audiofileDTO.getMultipartFile().transferTo(new File(originalFilePath));
-            Runtime.getRuntime().exec("ffmpeg -i " + originalFilePath + " " + convertedFilePath);
+            Process process = Runtime.getRuntime().exec("ffmpeg -i " + originalFilePath + " " + convertedFilePath);
+            try {
+                process.waitFor();
+                if (process.exitValue() != 0) {
+                    System.out.println("ffmpeg failed to process the file " + originalFilePath);
+                    return false;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
             //Finalize audiofile
             audiofile.setFileName(originalFilename);
             audiofileRepo.save(audiofile);
