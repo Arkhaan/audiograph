@@ -5,7 +5,12 @@
     <nav class="sidebar-nav">
         <ul class="menu-list">
             <li class="outer-li">
-                <button type="button" class="top-button">Trier par Catégories</button>
+                <button type="button" class="top-button">
+                    <a class="query-param" href="/">Accueil</a>
+                </button>
+            </li>
+            <li class="outer-li">
+                <button type="button" class="top-button">Filtrer par Catégories</button>
                 <ul class="inner-ul">
                     <li th:each="tag: ${tags}" class="inner-li">
                         <button type="button">
@@ -15,7 +20,7 @@
                 </ul>
             </li>
             <li class="outer-li">
-                <button type="button" class="top-button">Trier par Locuteurs</button>
+                <button type="button" class="top-button">Filtrer par Locuteurs</button>
                 <ul class="inner-ul">
                     <li th:each="user: ${users}" class="inner-li">
                         <button type="button">
