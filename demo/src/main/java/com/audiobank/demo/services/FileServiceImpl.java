@@ -71,7 +71,7 @@ public class FileServiceImpl implements FileService {
         long fileSize = audiofileDTO.getMultipartFile().getSize();
         System.out.println("Usable space: " + usableSpace);
         System.out.println("File size: " + fileSize);
-        if (usableSpace < (fileSize * 12)) {
+        if (usableSpace < (fileSize * 10)) {
             return false;
         }
         if ( extension.isPresent() ) { //&& supportedFormats.contains(extension.get()) ) {
