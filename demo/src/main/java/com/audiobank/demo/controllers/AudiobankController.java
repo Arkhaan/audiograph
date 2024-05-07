@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
 import com.audiobank.demo.repositories.AudiofileRepository;
@@ -28,6 +29,7 @@ import com.audiobank.demo.models.Audiofile;
 import com.audiobank.demo.models.Tag;
 import com.audiobank.demo.models.User;
 import com.audiobank.demo.models.DTOs.AudiofileDTO;
+import com.audiobank.demo.models.DTOs.UpdatefileDTO;
 
 @Controller
 @SessionAttributes("apikey")
@@ -53,6 +55,14 @@ public class AudiobankController {
         this.tagRepo = tagRepo;
         this.userService = userService;
         this.fileService = fileService;
+    }
+
+    public void populateSidebar(Model model)
+    {
+        List<Tag> tags = tagRepo.findAll();
+        model.addAttribute("tags", tags);
+        List<User> users = userService.getAll();
+        model.addAttribute("users", users);
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -134,22 +144,22 @@ public class AudiobankController {
         return "redirect:/login";
     }
 
-    @RequestMapping("/upload-file")
-    public String getUploadFile(Model model) {
-        if (model.getAttribute("apikey") == null) {
-            return "redirect:/login";
-        }
-        List<Tag> tags = tagRepo.findAll();
-        model.addAttribute("tags", tags);
-        List<User> users = userService.getAll();
-        model.addAttribute("users", users);
-
+    public void populateUploadPage(Model model) {
         List<String> names = userService.getAllFullName();
         model.addAttribute("fullnames", names);
         List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
                                     .collect(Collectors.toList());
         model.addAttribute("categories", categories);
         model.addAttribute("audiofile", new AudiofileDTO());
+    }
+
+    @RequestMapping("/upload-file")
+    public String getUploadFile(Model model) {
+        if (model.getAttribute("apikey") == null) {
+            return "redirect:/login";
+        }
+        populateSidebar(model);
+        populateUploadPage(model);
         return "upload-file";
     }
 
@@ -163,17 +173,9 @@ public class AudiobankController {
             model.addAttribute("uploadFailed", true);
         }
 
-        List<Tag> tags = tagRepo.findAll();
-        model.addAttribute("tags", tags);
-        List<User> users = userService.getAll();
-        model.addAttribute("users", users);
-
-        List<String> names = userService.getAllFullName();
-        model.addAttribute("fullnames", names);
-        List<String> categories = tagRepo.findAll().stream().map(tag ->tag.getValue())
-                                    .collect(Collectors.toList());
-        model.addAttribute("categories", categories);
-        model.addAttribute("audiofile", new AudiofileDTO());
+        populateSidebar(model);
+        populateUploadPage(model);
+        
         return "upload-file";
     }
 
@@ -182,10 +184,8 @@ public class AudiobankController {
         if ( model.getAttribute("apikey") == null) {
             return "redirect:/login";
         }
-        List<Tag> tags = tagRepo.findAll();
-        model.addAttribute("tags", tags);
-        List<User> users = userService.getAll();
-        model.addAttribute("users", users);
+        populateSidebar(model);
+
         model.addAttribute("filesPath", filesPath);
         List<Audiofile> audiofiles;
         audiofiles = audiofileRepo.findAllByUploaderID(userService.getUserId(model.getAttribute("apikey").toString()));
@@ -200,6 +200,49 @@ public class AudiobankController {
         }
         fileService.deleteFile(fileID, model.getAttribute("apikey").toString());
         return "redirect:/my-files";
+    }
+
+    public void populateEditPage(Model model, Long fileID) {
+        // get file title
+        String title = audiofileRepo.getTitle(fileID);
+        model.addAttribute("currentTitle", title);
+        // get file description
+        String description = audiofileRepo.getDescription(fileID);
+        model.addAttribute("currentDescription", description);
+        // get file speaker names
+        List<String> names = audiofileRepo.getNames(fileID);
+        model.addAttribute("names", names);
+        // get file tags
+        List<String> currentTags = audiofileRepo.getTags(fileID);
+        model.addAttribute("currentTags", currentTags);
+        // Create empty object
+        model.addAttribute("audiofile", new UpdatefileDTO());
+        model.addAttribute("fileid", fileID);
+    }
+
+    @RequestMapping(value = "/edit-file")
+    public String editFileRequest(Model model, @RequestParam(name = "fileid") Long fileID) {
+        if ( model.getAttribute("apikey") == null) {
+            return "redirect:/login";
+        }
+        populateSidebar(model);
+        populateEditPage(model, fileID);
+        
+        return "edit-file";
+    }
+
+    @RequestMapping(value = "/edit-file", method = RequestMethod.POST)
+    public String updateFile(Model model, @RequestParam(name = "fileid") Long fileID, @ModelAttribute("audiofile") UpdatefileDTO audiofile) throws IOException {
+        String apiKey = model.getAttribute("apikey").toString();
+        if ( fileService.updateFile(audiofile, fileID, apiKey) ) {
+            model.addAttribute("updateSuccess", true);
+        }
+        else {
+            model.addAttribute("updateFailed", true);
+        }
+        populateSidebar(model);
+        populateEditPage(model, fileID);
+        return "edit-file";
     }
     
 }

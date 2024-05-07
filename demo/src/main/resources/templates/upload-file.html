@@ -26,7 +26,7 @@
             </div>
             <div id="sign-up-window">
                 <div id="sign-up-form">
-                    <form action="/upload-file" method="post" enctype="multipart/form-data" th:object="${audiofile}">
+                    <form action="/upload-file" id="myform" enctype="multipart/form-data" method="post" th:object="${audiofile}">
             
                         <p id="form-title">Télécharge un nouveau fichier audio</p>
                         <p th:if="${uploadFailed}">Erreur lors du téléchargement du ficher!<br />Il est possible qu'il n'y ait plus de place sur le serveur ou que la conversion du fichier n'ait pas fonctionné, contactez l'administrateur.</p>
@@ -34,31 +34,63 @@
             
                         <input type="text" id="title" name="title" th:field="*{title}" placeholder="Titre" maxlength="45" required>
                         <input type="file" id="file" name="file" th:field="*{multipartFile}">
-                        <input type="text" id="description" name="description" th:field="*{description}" placeholder="Description">
-                        <div class="form-group">
-                            <label for="names">Choisissez un ou plusieurs locuteurs</label>
-                            <select class="form-control selectpicker" id="names" th:field="*{names}" title="Selectionnez un ou plusieurs choix" multiple required onchange="fullnameChange();">
-                                <option value="" disabled hidden></option>
-                                <option th:each="name : ${fullnames}"
-                                        th:value="${name}"
-                                        th:text="${name}">name
-                                </option>
-                                <option value="new-names">Ajouter quelqu'un</option>
-                            </select>
-                            <p>Vous pouvez rajouter des locuteurs (au format Prénom Nom), séparés par une virgule:</p>
-                            <input type="text" id="new-names" th:field="*{newNames}">
+                        <div class="input-box">
+                            <input type="text" name="description" id="description" th:field="*{description}" placeholder="Description (Optionnel)">
                         </div>
-                        <div class="form-group">
-                            <label for="categories">Choisissez une ou plusieurs catégories</label>
-                            <select class="form-control selectpicker" id="categories" th:field="*{tags}" title="Selectionnez un ou plusieurs choix" multiple>
-                                <option value="" disabled hidden></option>
-                                <option th:each="category : ${categories}"
-                                        th:value="${category}"
-                                        th:text="${category}">category
-                                </option>
-                            </select>
-                            <p>Vous pouvez rajouter des catégories, séparées par une virgule:</p>
-                            <input type="text" id="new-categories" th:field="*{newTags}">
+                        <div class="input-box input-box-complex">
+                            <div class="horizontal-box">
+                                <div>Ajoutez au moins un locuteur: </div>
+                                <div id="currentNames"></div>
+                            </div>
+                            <div class="input-options">
+                                <div class="horizontal-box">
+                                    <div>Rajouter depuis une liste: </div>
+                                        <select id="names-list" onchange="addExistingName();">
+                                            <option value="" selected disabled hidden></option>
+                                            <option th:each="user : ${users}"
+                                                    th:value="${user.first_name + ' ' + user.last_name}"
+                                                    th:text="${user.first_name + ' ' + user.last_name}">name
+                                            </option>
+                                        </select>
+                                </div>
+                                <div class="add-new">
+                                    <div>Créer un nouveau locuteur: </div>
+                                    <div class="add-new-fields">
+                                        <input type="text" id="first-name" placeholder="Prénom">
+                                        <input type="text" id="last-name" placeholder="Nom de famille">
+                                    </div>
+                                    <div id="add-new-button">
+                                        <button type="button" onclick="addNewName()">Valider</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-box input-box-complex">
+                            <div class="horizontal-box">
+                                <div>Catégories: </div>
+                                <div id="currentTags"></div>
+                            </div>
+                            <div class="input-options">
+                                <div class="horizontal-box">
+                                    <div>Rajouter depuis une liste: </div>
+                                        <select id="tags-list" onchange="addExistingTag();">
+                                            <option value="" selected disabled hidden></option>
+                                            <option th:each="tag : ${tags}"
+                                                    th:value="${tag.value}"
+                                                    th:text="${tag.value}">tag
+                                            </option>
+                                        </select>
+                                </div>
+                                <div class="add-new">
+                                    <div>Créer une nouvelle catégorie: </div>
+                                    <div class="add-new-fields">
+                                        <input type="text" id="tag" placeholder="Catégorie">
+                                    </div>
+                                    <div id="add-new-button">
+                                        <button type="button" onclick="addNewTag()">Valider</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div style="text-align: center;">
                             <button type="submit" id="btn btn-primary" class="submit-button">Télécharger</button>
@@ -74,24 +106,97 @@
 
 <script>
 
-    function fullnameChange() {
-        select = document.getElementById("names");
-        selections = Array.from(select.options).filter(o => o.selected).map(o => o.value);
-        if (selections.includes("new-names")) {
-            document.getElementById("new-names").required = true;
-            console.log("found it");
-        } else {
-            document.getElementById("new-names").required = false;
-        }
+    var boxUniqueID = 0;
+
+    function removeBox(boxID) {
+        document.getElementById(boxID).remove();
+    }
+
+    function createBox(text, parentID) {
+        // create outer div
+        var element = document.createElement("div");
+        element.classList.add("unique-box");
+        var boxID = "unique-box-" + boxUniqueID;
+        element.id = boxID;
+        // create delete box
+        var closeSpan = document.createElement("span");
+        closeSpan.classList.add("closeSpan");
+        closeSpan.innerText = "X";
+        closeSpan.setAttribute("onclick",`removeBox("${boxID}")`);
+        // create text box
+        var textBox = document.createElement("div");
+        textBox.innerText = text;
+        element.appendChild(closeSpan);
+        element.appendChild(textBox);
+        document.getElementById(parentID).appendChild(element);
+        boxUniqueID += 1;
+    }
+
+    function addExistingName() {
+        select = document.getElementById("names-list").value;
+        createBox(select, "currentNames");
+    }
+
+    function addNewName() {
+        firstName = document.getElementById("first-name").value;
+        lastName = document.getElementById("last-name").value;
+        createBox(firstName + " " + lastName, "currentNames");
+    }
+
+    function addExistingTag() {
+        select = document.getElementById("tags-list").value;
+        createBox(select, "currentTags");
+    }
+
+    function addNewTag() {
+        tag = document.getElementById("tag").value;
+        createBox(tag, "currentTags");
     }
 
 </script>
 
-<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(function() {
+        $('#first-name').on('keypress', function(e) {
+            if (e.which == 32)
+                return false;
+        });
+    });
+    $(function() {
+        $('#last-name').on('keypress', function(e) {
+            if (e.which == 32)
+                return false;
+        });
+    });
 
+    $('#myform').on('submit', function() {
+        count = 0;
+        $('#currentNames').children('.unique-box').each( function() {
+            text = $(this).children('div').text();
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'names'+count,
+                name: 'names['+count+']',
+                value: text
+            }).appendTo('form');
+            count += 1;
+        });
+        count = 0;
+        $('#currentTags').children('.unique-box').each( function() {
+            text = $(this).children('div').text();
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'tags'+count,
+                name: 'tags['+count+']',
+                value: text
+            }).appendTo('form');
+            count += 1;
+        });
 
+        return true;
+    });
+</script>
 
 
 

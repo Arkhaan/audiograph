@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import com.audiobank.demo.models.DTOs.AudiofileDTO;
+import com.audiobank.demo.models.DTOs.UpdatefileDTO;
 
 public interface FileService {
     
     Boolean saveFile(AudiofileDTO audiofile, String apiKey) throws IOException;
+    Boolean updateFile(UpdatefileDTO audiofile, Long fileID, String apiKey) throws IOException;
 
     Optional<String> getFileExtension(String fileName);
     Optional<String> getFileNameWithoutExtension(String fileName);

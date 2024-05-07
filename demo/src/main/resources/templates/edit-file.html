@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audiograph</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/color-styles.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <a class="logout" href="/logout">
+        <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-10-1/1024/logout10-512.png" alt="logout" title="logout">
+    </a>
+    <div class="main-layout">
+        <div th:replace="~{fragments/sidebar}">
+        </div>
+        <div class="main-panel">
+            <div th:replace="~{fragments/site-header}">
+            </div>
+            <form th:action="@{/edit-file(fileid=${fileid})}" id="myform" class="update-form" method="post" th:object="${audiofile}">
+                <p th:if="${updateFailed}">Erreur lors de la mise à jour!</p>
+                <p th:if="${updateSuccess}">Mise à jour réussi!</p>
+                <div class="input-box">
+                    <label for="title">Titre</label>
+                    <input type="text" name="title" th:value="${currentTitle}" id="title" maxlength="45" required>
+                </div>
+                <div class="input-box">
+                    <label for="description">Description</label>
+                    <input type="text" name="description" id="description" th:value="${currentDescription}">
+                </div>
+                <div class="input-box input-box-complex">
+                    <div class="horizontal-box">
+                        <div>Locuteurs: </div>
+                        <div id="currentNames"></div>
+                    </div>
+                    <div class="input-options">
+                        <div class="horizontal-box">
+                            <div>Rajouter depuis une liste: </div>
+                                <select id="names-list" onchange="addExistingName();">
+                                    <option value="" selected disabled hidden></option>
+                                    <option th:each="user : ${users}"
+                                            th:value="${user.first_name + ' ' + user.last_name}"
+                                            th:text="${user.first_name + ' ' + user.last_name}">name
+                                    </option>
+                                </select>
+                        </div>
+                        <div class="add-new">
+                            <div>Créer un nouveau locuteur: </div>
+                            <div class="add-new-fields">
+                                <input type="text" id="first-name" placeholder="Prénom">
+                                <input type="text" id="last-name" placeholder="Nom de famille">
+                            </div>
+                            <div id="add-new-button">
+                                <button type="button" onclick="addNewName()">Valider</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-box input-box-complex">
+                    <div class="horizontal-box">
+                        <div>Catégories: </div>
+                        <div id="currentTags"></div>
+                    </div>
+                    <div class="input-options">
+                        <div class="horizontal-box">
+                            <div>Rajouter depuis une liste: </div>
+                                <select id="tags-list" onchange="addExistingTag();">
+                                    <option value="" selected disabled hidden></option>
+                                    <option th:each="tag : ${tags}"
+                                            th:value="${tag.value}"
+                                            th:text="${tag.value}">tag
+                                    </option>
+                                </select>
+                        </div>
+                        <div class="add-new">
+                            <div>Créer une nouvelle catégorie: </div>
+                            <div class="add-new-fields">
+                                <input type="text" id="tag" placeholder="Catégorie">
+                            </div>
+                            <div id="add-new-button">
+                                <button type="button" onclick="addNewTag()">Valider</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                    <button type="submit" id="btn btn-primary" class="submit-button">Modifier</button>
+                </div>
+    
+            </form>
+        </div>
+    </div>
+
+</body>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var names = /*[[${names}]]*/ [];
+    var currentTags = /*[[${currentTags}]]*/ [];
+    
+/*]]>*/
+
+    var boxUniqueID = 0;
+
+    function removeBox(boxID) {
+        document.getElementById(boxID).remove();
+    }
+
+    function createBox(text, parentID) {
+        // create outer div
+        var element = document.createElement("div");
+        element.classList.add("unique-box");
+        var boxID = "unique-box-" + boxUniqueID;
+        element.id = boxID;
+        // create delete box
+        var closeSpan = document.createElement("span");
+        closeSpan.classList.add("closeSpan");
+        closeSpan.innerText = "X";
+        closeSpan.setAttribute("onclick",`removeBox("${boxID}")`);
+        // create text box
+        var textBox = document.createElement("div");
+        textBox.innerText = text;
+        element.appendChild(closeSpan);
+        element.appendChild(textBox);
+        document.getElementById(parentID).appendChild(element);
+        boxUniqueID += 1;
+    }
+
+    window.onload = function loadUsersAndTags() {
+        for (name of names) {
+            createBox(name, "currentNames");
+        }
+        for (tag of currentTags) {
+            createBox(tag, "currentTags");
+        }
+
+    }
+
+    function addExistingName() {
+        select = document.getElementById("names-list").value;
+        createBox(select, "currentNames");
+    }
+
+    function addNewName() {
+        firstName = document.getElementById("first-name").value;
+        lastName = document.getElementById("last-name").value;
+        createBox(firstName + " " + lastName, "currentNames");
+    }
+
+    function addExistingTag() {
+        select = document.getElementById("tags-list").value;
+        createBox(select, "currentTags");
+    }
+
+    function addNewTag() {
+        tag = document.getElementById("tag").value;
+        createBox(tag, "currentTags");
+    }
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(function() {
+        $('#first-name').on('keypress', function(e) {
+            if (e.which == 32)
+                return false;
+        });
+    });
+    $(function() {
+        $('#last-name').on('keypress', function(e) {
+            if (e.which == 32)
+                return false;
+        });
+    });
+
+    $('#myform').on('submit', function() {
+        count = 0;
+        $('#currentNames').children('.unique-box').each( function() {
+            text = $(this).children('div').text();
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'names'+count,
+                name: 'names['+count+']',
+                value: text
+            }).appendTo('form');
+            count += 1;
+        });
+        count = 0;
+        $('#currentTags').children('.unique-box').each( function() {
+            text = $(this).children('div').text();
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'tags'+count,
+                name: 'tags['+count+']',
+                value: text
+            }).appendTo('form');
+            count += 1;
+        });
+
+        return true;
+    });
+</script>

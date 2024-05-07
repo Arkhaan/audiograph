@@ -25,6 +25,7 @@ import com.audiobank.demo.models.FileUser;
 import com.audiobank.demo.models.Tag;
 import com.audiobank.demo.models.User;
 import com.audiobank.demo.models.DTOs.AudiofileDTO;
+import com.audiobank.demo.models.DTOs.UpdatefileDTO;
 import com.audiobank.demo.repositories.AudiofileRepository;
 import com.audiobank.demo.repositories.FileTagRepository;
 import com.audiobank.demo.repositories.FileUserRepository;
@@ -102,13 +103,30 @@ public class FileServiceImpl implements FileService {
             //Finalize audiofile
             audiofile.setFileName(originalFilename);
             audiofileRepo.save(audiofile);
-            audiofileDTO.convertNewNames();
-            audiofileDTO.convertNewTags();
             addTags(audiofileDTO.getTags(), audiofile.getFile_id());
             addNames(audiofileDTO.getNames(), audiofile.getFile_id());
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Boolean updateFile(UpdatefileDTO audiofileDTO, Long fileID, String apiKey) throws IOException {
+        // get file from database and update it
+        Optional<Audiofile> audiofileOpt = audiofileRepo.findByID(fileID);
+        if (!audiofileOpt.isPresent()) {
+            return false;
+        }
+        Audiofile audiofile = audiofileOpt.get();
+        audiofile.setTitle(audiofileDTO.getTitle());
+        audiofile.setDescription(audiofileDTO.getDescription());
+        audiofileRepo.save(audiofile);
+        // Add tags and names
+        fileTagRepo.deleteEntry(fileID);
+        fileUserRepo.deleteEntry(fileID);
+        addTags(audiofileDTO.getTags(), fileID);
+        addNames(audiofileDTO.getNames(), fileID);
+        return true;
     }
 
     @Override
@@ -160,6 +178,8 @@ public class FileServiceImpl implements FileService {
     public void deleteFile(Long fileID, String apiKey) throws IOException {
         String filename = audiofileRepo.getFileName(fileID);
         audiofileRepo.deleteFile(fileID, userRepo.findByApiKey(apiKey).get().getId());
+        fileTagRepo.deleteEntry(fileID);
+        fileUserRepo.deleteEntry(fileID);
         Path fileToDeletePath = Paths.get(filesFullpath + convertedPath + getFileNameWithoutExtension(filename).get() + ".wav");
         Files.delete(fileToDeletePath);
         fileToDeletePath = Paths.get(filesFullpath + originalPath + filename);

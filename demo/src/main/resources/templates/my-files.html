@@ -37,6 +37,7 @@
                         </audio>
                         <p th:text="${audiofile.full_names}"></p>
                         <i><p th:text="${audiofile.tags}"></p></i>
+                        <a th:href="@{/edit-file(fileid = ${audiofile.file_id})}" class="button3">Modifier</a>
                         <a class="fa fa-trash" th:href="@{/delete-file(fileid = ${audiofile.file_id})}" onclick="return confirm('Etes-vous sur de vouloir supprimer ce fichier ? Il ne sera pas possible de le récupérer !')"></a>
                     </div>
                 </div>
