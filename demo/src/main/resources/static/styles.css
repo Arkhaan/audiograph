@@ -112,7 +112,7 @@ a {
   border-radius: 3%;
   border-color: blueviolet;
   margin: 10px;
-  height: 15em;
+  /*height: 15em;*/
   width: 20em;
 }
 
