@@ -63,6 +63,7 @@ public class AudiobankController {
         model.addAttribute("tags", tags);
         List<User> users = userService.getAll();
         model.addAttribute("users", users);
+        model.addAttribute("connectedUsers", userService.getConnectedUsers(model.getAttribute("apikey").toString()));
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -73,10 +74,7 @@ public class AudiobankController {
         if (model.getAttribute("apikey") == null) {
             return "redirect:/login";
         }
-        List<Tag> tags = tagRepo.findAll();
-        model.addAttribute("tags", tags);
-        List<User> users = userService.getAll();
-        model.addAttribute("users", users);
+        populateSidebar(model);
         model.addAttribute("filesPath", filesPath);
         List<Audiofile> audiofiles;
         if (tagID != null) {

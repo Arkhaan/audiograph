@@ -7,6 +7,9 @@
     /*border-style: solid;*/
     margin: 0;
     width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .side-panel header {
@@ -254,4 +257,17 @@ a.button3:hover{
 
 #names-list {
   margin-left: 10px;
+}
+
+#connected-users {
+  display: flex;
+  bottom: 0px;
+  margin-left: 5px;
+  font-size: 0.8em;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#connected-users * {
+  margin-bottom: 0;
 }

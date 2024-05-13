@@ -1,44 +1,50 @@
 <div th:fragment="sidebar" class="side-panel">
-    <header>
-        Menu
-    </header>
-    <nav class="sidebar-nav">
-        <ul class="menu-list">
-            <li class="outer-li">
-                <button type="button" class="top-button">
-                    <a class="query-param" href="/">Accueil</a>
-                </button>
-            </li>
-            <li class="outer-li">
-                <button type="button" class="top-button">Filtrer par Catégories</button>
-                <ul class="inner-ul">
-                    <li th:each="tag: ${tags}" class="inner-li">
-                        <button type="button">
-                            <a class="query-param" th:text="${tag.value}" th:href="@{/(tagid = ${tag.id})}"></a>
-                        </button>
-                    </li>
-                </ul>
-            </li>
-            <li class="outer-li">
-                <button type="button" class="top-button">Filtrer par Locuteurs</button>
-                <ul class="inner-ul">
-                    <li th:each="user: ${users}" class="inner-li">
-                        <button type="button">
-                            <a class="query-param" th:text="${user.first_name + ' ' + user.last_name}" th:href="@{/(userid = ${user.id})}"></a>
-                        </button>
-                    </li>
-                </ul>
-            </li>
-            <li class="outer-li">
-                <button type="button" class="top-button">
-                    <a class="query-param" href="/my-files">Gérer mes fichiers</a>
-                </button>
-            </li>
-            <li class="outer-li">
-                <button type="button" class="top-button">
-                    <a class="query-param" href="/upload-file">Télécharger un fichier</a>
-                </button>
-            </li>
-        </ul>
-    </nav>
+    <div>
+        <header>
+            Menu
+        </header>
+        <nav class="sidebar-nav">
+            <ul class="menu-list">
+                <li class="outer-li">
+                    <button type="button" class="top-button">
+                        <a class="query-param" href="/">Accueil</a>
+                    </button>
+                </li>
+                <li class="outer-li">
+                    <button type="button" class="top-button">Filtrer par Catégories</button>
+                    <ul class="inner-ul">
+                        <li th:each="tag: ${tags}" class="inner-li">
+                            <button type="button">
+                                <a class="query-param" th:text="${tag.value}" th:href="@{/(tagid = ${tag.id})}"></a>
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li class="outer-li">
+                    <button type="button" class="top-button">Filtrer par Locuteurs</button>
+                    <ul class="inner-ul">
+                        <li th:each="user: ${users}" class="inner-li">
+                            <button type="button">
+                                <a class="query-param" th:text="${user.first_name + ' ' + user.last_name}" th:href="@{/(userid = ${user.id})}"></a>
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li class="outer-li">
+                    <button type="button" class="top-button">
+                        <a class="query-param" href="/my-files">Gérer mes fichiers</a>
+                    </button>
+                </li>
+                <li class="outer-li">
+                    <button type="button" class="top-button">
+                        <a class="query-param" href="/upload-file">Télécharger un fichier</a>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div id="connected-users">
+        <p>Connectés:</p>
+        <p th:each="connectedUser: ${connectedUsers}" th:text="${connectedUser}"></p>
+    </div>
 </div>

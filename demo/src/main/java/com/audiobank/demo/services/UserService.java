@@ -18,6 +18,8 @@ public interface UserService {
 
     List<User> getAll();
 
+    List<String> getConnectedUsers(String apiKey);
+
     List<String> getAllFullName();
 
     List<String> getUnclaimedUsers();

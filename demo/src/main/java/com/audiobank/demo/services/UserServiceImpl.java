@@ -11,14 +11,23 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    class ConnectedUser {
+        public String name;
+        public Instant time;
+    }
     UserRepository userRepository;
+    List<ConnectedUser> connectedUsers = new ArrayList<>();
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -92,6 +101,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<String> getConnectedUsers(String apiKey) {
+        // clear users who timed out
+        User user = userRepository.findByApiKey(apiKey).get();
+        List<ConnectedUser> newlist = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        Instant now = Instant.now();
+        for (ConnectedUser cu : connectedUsers) {
+            if (cu.time.isAfter(now) && !cu.name.equals(user.getFullName())) {
+                newlist.add(cu);
+                names.add(cu.name);
+            }
+        }
+        Instant connectionTime = Instant.now().plusSeconds(600);
+        ConnectedUser newUser = new ConnectedUser();
+        newUser.name = user.getFullName();
+        newUser.time = connectionTime;
+        newlist.add(newUser);
+        connectedUsers = newlist;
+        return names;
     }
 
     @Override
